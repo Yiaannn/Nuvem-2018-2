@@ -12,7 +12,7 @@
 
 ### 1. Descreva o passo a passo utilizado
 
-Para criar os grupos e usuários, procurou-se nas "Regras de Preenchimento dos Roteiros" as informações do usuário raiz. Uma vez acessado o site de sign-in com as informações de usuário, acessamos o submenu "My Security Credentials" contido no menu com o nome do usuário raiz, e uma vez nesse menu acessou-se a opção "Groups" no painel exibido
+Para criar os grupos e usuários, procurou-se nas "Regras de Preenchimento dos Roteiros" as informações do usuário raiz. Uma vez acessado o site de sign-in com as informações de usuário, acessamos o submenu "My Security Credentials" contido no menu com o nome do usuário raiz, redirecionando a página para o menu IAM (Identity and Access Management) e uma vez nesse menu acessou-se a opção "Groups" no painel exibido.
 
 Um novo grupo nomeado "Integrantes" foi criado, habilitado com a permissão de "AdministratorAccess".
 
@@ -20,9 +20,9 @@ Para criar os usuários, utilizou-se da opção "Users" no painel, fez-se usuár
 
 ### 2. O que são Policies? Por que elas são importantes e devem ser bem definidas?
 
-Policies, no contexto da AWS, são as regras que definem e gerenciam as permissões dos objetos AWS, incluindo usuários e processos, regendo o escopo de acesso que eles podem seguir.
+Policies, no contexto da computação, são as regras que definem e gerenciam as permissões dos objetos em um sistema, incluindo usuários e processos, regendo o escopo de acesso que eles podem seguir.
 
-Ter policies bem definidas mantém seu ambiente operacionalmente seguro ao reger uma hierarquia bem definida de limites do que cada objeto AWS pode ou não fazer.
+Ter policies bem definidas mantém seu ambiente operacionalmente seguro ao reger uma hierarquia bem definida de limites do que cada objeto pode ou não fazer.
 
 ***
 
@@ -46,9 +46,9 @@ Confirmou-se que no menu *Configure Security Group* a porta SSH estava aberta pa
 
 - **VPC** do inglês Virtual Private Cloud, se refere a um serviço de Cloud Computing em que seu administrador tem controle dos seus mecanismos internos sendo a rede privada para sí, ainda que não tenha controle das máquinas físicas que à compõe.
 
-- **subnet** descreve uma rede de networking que interfaceia com uma rede externa maior (como por exemplo uma rede domicial regida por um roteador interfaciando com a internet).
+- **subnet** descreve uma rede de networking que interfaceia com uma rede externa maior (como por exemplo uma rede domiciliar regida por um roteador interfaceiando com a internet).
 
-- **securitygroup** é um agrupmanto de objetos (sendo esses usuários, contas, instâncias, etc) sujeitos às mesmas policies, essas descritas anteriormente.
+- **securitygroup** rege o controle de acesso de packets para as instâncias de uma dada rede, definindo quais portas podem ser usadas e por quais IPs.
 
 ### 3. O poder computacional das instâncias é medido em vCPU. O que é vCPU?
 
@@ -62,7 +62,7 @@ vCPU, literalmente virtual CPU, representa uma alocação de processamento dispo
 
 Foram criadas 4 instâncias, uma do tipo *t2.medium* e três do tipo *m3.medium*.
 
-Criar instãncias automaticamente não é um atributo ineremente ruim, mas a forma com que foi feita foi pouco transperente quanto ao que seria criado e em que quantidade. Um processo automatizado que esclaressece melhor sua rotina seria mais bem-vindo.
+Criar instãncias automaticamente não é um atributo inerentemente ruim, mas a forma com que foi feita foi pouco transparente quanto ao que seria criado e em que quantidade. Um processo automatizado que esclarecesse melhor sua rotina seria mais bem-vindo.
 
 ### 2. Quanto custou o protótipo? Assuma que usou uma hora de cada instância.
 
@@ -81,7 +81,7 @@ As versões mais baratas disponíveis na Amazon que não são usadas estão a ce
 ### 2. Agora, somando o fato de que hardware deprecia com o tempo e possui um custo mensal de manutenção, compare em termos de custo uma Public Cloud e um Datacenter próprio.
 
 
-O preço de manter esse ambiente na Public Cloud seria de 193,44 dólares se ele rodasse 24/7 por um mês consecutivo. a princípio isso pareceria significar que o Datacenter físico compensaria depois de 6 meses, mas não estamos considerando o custo de um especialista para a manutenção do hardware físico e o custo da eletricidade que será consumida.
+O preço de manter esse ambiente na Public Cloud seria de 193,44 dólares se ele rodasse 24/7 por um mês consecutivo, ou cerca de 100 dólares se ele fosse reservado por um ano. A princípio isso pareceria significar que o Datacenter físico compensaria depois de 6 meses, mas não estamos considerando o custo de um especialista para a manutenção do hardware físico, o custo da eletricidade que será consumida, o custo por um seguro para o Datacenter, etc.
 ***
 
 ## Escalabilidade
@@ -100,13 +100,17 @@ AMI, ou Amazon Machine Image, é a interface providenciada pela AWS para utiliza
 
 ### 2. O que faz o LoadBalancer? Explique o algoritmo utilizado.
 
+Um LoadBalancer tem o intuito de garantir um acesso homogêneo dos clientes para a rede cloud formada por várias instâncias.
+
+ O LoadBalancer Classic oferecido pela AWS performa *health checks* regulares nas instâncias na forma de pings, levando em consideração o tempo de resposta utilizado para decidir quais instâncias estão mais aptas a receberem tráfego de entrada dos clientes procurando acessar a rede. Para isso o acesso à rede é feito pelo IP (ou nome de endereço traduzido pelo DNS) do LoadBalancer, que rapidamente redireciona o usuário para o IP da instância escolhida.
+
 ***
 
 ## Fazendo uso da Escalabilidade Horizontal
 
 ### 1. Enfim, como funciona o Autoscalling Group da AWS?
 
-O Autoscalling group monitora a carga de cada instância por uma métrica pré-definida, como pelo uso da vCPU, e automaticamente gerencia a criação de novas instâncias quando a carba é alto e a desativação de instâncias quando baixa, seguindo policies setadas pelo seu administrador.
+O Autoscalling group monitora a carga de cada instância por uma métrica pré-definida, como pelo uso da vCPU, e automaticamente gerencia a criação de novas instâncias quando a carga é alto e a desativação de instâncias quando baixa, seguindo policies setadas pelo seu administrador.
 
 ### 2. Qual a diferença entre escalabilidade horizontal e escalabilidade vertical?
 
@@ -116,7 +120,7 @@ Escalabilidade vertical se refere a quando a escalabilidade de um dado serviço 
 
 ### 3. Qualquer serviço pode fazer uso desse modelo?
 
-Não, existem serviços para os quais a paralelização dos seus serviços não é a melhor resposta para seus problemas. Para um servidor bancário por exemplo, garantir a sincronicidade dos dados e validação deles com múltiplicos micro servidores pode não ser viável.
+Não, existem serviços para os quais a paralelização dos seus serviços não é a melhor resposta para seus problemas. Para um servidor bancário por exemplo, garantir a sincronização dos dados e validação deles com múltiplos micro servidores pode não ser viável.
 
 ***
 
@@ -130,9 +134,9 @@ Similar a uma instância AWS, a diferença está em que instâncias são uma abs
 
 ### 2. Defina Platform as a Service (PaaS) e Software as a Service (SaaS).
 
-SaaS é um serviço que providencia acesso a softwares via um serviço, como pelo acesso da Internet. Um bom exemplo disso é a suíte de serviçoes da Google, que tem diferentes serviços como de email, geolocalização, manejamento remoto de impressoras, etc.
+SaaS é um serviço que providencia acesso a softwares via um serviço, como pelo acesso da Internet. Um bom exemplo disso é a suíte de serviços da Google, que tem diferentes serviços como de email, geolocalização, manejamento remoto de impressoras, etc.
 
-PaaS é um serviço que providencia uma plataforma capaz de ser usadas para desenvolver e hostear serviçoes, podendo até mesmo serem usadas para providenciar serviços em SaaS. Diferente de Iaas (Infrastrucutre as a Service), um PaaS não requer que você tenha acesso ou controle da máquina física ou virtual que provide essa plataforma.
+PaaS é um serviço que providencia uma plataforma capaz de ser usadas para desenvolver e hostear serviços, podendo até mesmo serem usadas para providenciar serviços em SaaS. Diferente de IaaS (Infrastrucutre as a Service), um PaaS não requer que você tenha acesso ou controle da máquina física ou virtual que providencia essa plataforma.
 
 ### 3. O modelo LoadBalancer possui um custo fixo elevado. Como você justificaria o uso e a configuração de um LoadBalancer para uma empresa?
 
@@ -150,11 +154,11 @@ A vantagem de usar uma Public Cloud é que a manutenção e gerenciamento do Dat
 
 ### 2. Defina Infrastructure as a Service (IaaS).
 
-Infrastructure as a Service descreve um serviço em que o usuário é capaz de utilizar máquinas remotas (físicas ou virtuais) para desenvolver, hostear ou processar dados, sendo possível até usar um IaaS para providenciar um serviço de PaaS. A AWS que foi o foco de estudo neste roteiro é um IaaS.
+Infrastructure as a Service descreve um serviço em que o usuário é capaz de utilizar máquinas remotas (físicas ou virtuais) para desenvolver, hostear ou processar dados, sendo possível até usar um IaaS para providenciar um serviço de PaaS. A EC2 da AWS que foi o foco de estudo neste roteiro é um IaaS.
 
 ### 3. Defina Escalabilidade.
 
-Escalabilidade é a característica de um serviço de poder facilmente ser adequado a uma quantidade varável de usuários, com um custo próximo a diretamente proporcional de manutenção do serviço para o número de clientes.
+Escalabilidade é a característica de um serviço de poder facilmente ser adequado a uma quantidade variável de usuários, com um custo próximo a diretamente proporcional de manutenção do serviço para o número de clientes.
 
 ***
 
@@ -162,6 +166,6 @@ Escalabilidade é a característica de um serviço de poder facilmente ser adequ
 
 ### Imagine como é o processo de alocação de uma instância. O que é realmente uma instância? Como você montaria um ambiente similar a AWS em um Datacenter próprio?
 
-Uma instância é uma máquina virtual que abstrai a implementação específica da máquina física que à implementa. Simular a AWS requeriria no mínimo uma grande quantidade de computadores de alto custo-benefício, cada um rodando múltiplas possíveis instâncias de características distintas.
+Uma instância é uma máquina virtual que abstrai a implementação específica da máquina física que à implementa. Simular a AWS requereria no mínimo uma grande quantidade de computadores de alto custo-benefício, cada um rodando múltiplas possíveis instâncias de características distintas.
 
 Uma grande quantidade de bandwidth também seria necessária, assim como a capacidade de prover diferentes IPs únicos conectados à Internet. Além disso os computadores do Datacenter necessitariam implementar algum software manejamento para a criação e gerenciamento das instâncias, é possível desenvolver a própria, mas soluções abertas existem, como a OpenStack.
