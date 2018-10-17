@@ -1,0 +1,17 @@
+name: vanilla
+summary: Vanilla is an open-source, pluggable, multi-lingual forum.
+maintainer: Alexandre Young <alexandreycc@al.insper.edu.br>
+description: |
+  Vanilla is designed to deploy and grow small communities to scale.
+  This charm deploys Vanilla Forums as outlined by the Vanilla Forums
+  installation guide.
+
+  (This is in truth a practice charm as suggested by the Juju documentation)
+tags:
+  - social
+provides:
+  website:
+    interface: http
+requires:
+  database:
+    interface: mysql
