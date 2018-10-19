@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e # If any command fails, stop execution of the hook with that error
-apt-get install -y apache2 php5-cgi php5-mysql curl php5-gd wget libapache2-mod-php5
+apt-get install -y apache2 php-cgi php-mysql curl php-gd wget libapache2-mod-php
 dl="https://github.com/vanillaforums/Garden/archive/Vanilla_2.0.18.8.tar.gz"
 # Grab Vanilla from upstream.
 status-set maintenance "Fetching and installing Vanilla"
