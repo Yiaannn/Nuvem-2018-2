@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from flask import Flask, abort
 from flask_restful import Api, Resource, reqparse
 
