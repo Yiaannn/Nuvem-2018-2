@@ -108,4 +108,4 @@ api.add_resource(Task, '/Tarefa/<int:id>')#, endpoint = 'task_dict')
 api.add_resource(TaskGroup, '/Tarefa')#, endpoint = 'task_dict')
 api.add_resource(HealthCheck, '/healthcheck')#, endpoint = 'task_dict')
 
-app.run(debug=True)
+app.run(debug=True,host="0.0.0.0",port = 5000)
