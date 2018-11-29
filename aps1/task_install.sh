@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #Script de init das instances
 git clone https://github.com/Yiaannn/Nuvem-2018-2
-sudo chmod +x ./Nuvem-2018-2/aps1/task_service.py
 
 sudo apt-get update
 sudo apt-get install -y python3-pip
