@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #Script de init das instances
+cd /home/ubuntu
 git clone https://github.com/Yiaannn/Nuvem-2018-2
 
 sudo apt-get update
