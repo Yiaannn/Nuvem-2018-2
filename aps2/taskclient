@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+
+import requests
+import argparse
+import json
+import os
+import sys
+import validators
+
+#Pelo que entendi, isto vai ser fundamentalmente um client pro serviço feito na APS1
+
+#Por enquanto setar o url hardcoded
+url= os.environ.get('TASKSERVICE_URL')
+if url is None:
+    print("Environment variable TASKSERVICE_URL not set, aborting.") #talvez o professor prefira um default se não tiver setado, não sei
+    sys.exit(1)
+
+if not validators.url(url):
+    print("Environment variable TASKSERVICE_URL does not appear to be a valid URL, aborting.")
+    sys.exit(2)
+
+def call_help(args, url):
+    argparser.print_help()
+
+def task_add(args, url):
+    json_dict= json.load(args.json)
+    response= requests.post(url+'/Tarefa', json=json_dict)
+    print(json.dumps(response.json(), sort_keys=True, indent=4))
+
+def task_list(args, url):
+    response= requests.get(url+'/Tarefa')
+    print(json.dumps(response.json(), sort_keys=True, indent=4))
+
+def task_search(args, url):
+    id= '/'+str(args.id)
+    response= requests.get(url+'/Tarefa'+id)
+    print(json.dumps(response.json(), sort_keys=True, indent=4))
+
+def task_delete(args, url):
+    id= '/'+str(args.id)
+    response= requests.delete(url+'/Tarefa'+id)
+    print(json.dumps(response.json(), sort_keys=True, indent=4))
+
+def task_update(args, url):
+    id= '/'+str(args.id)
+    json_dict= json.load(args.json)
+    response= requests.put(url+'/Tarefa'+id, json=json_dict)
+    print(json.dumps(response.json(), sort_keys=True, indent=4))
+
+argparser=argparse.ArgumentParser()
+subparsers = argparser.add_subparsers()
+help_parser= subparsers.add_parser('help', help='Displays this help message')
+add_parser= subparsers.add_parser('add', help='Add a new task to the task service')
+list_parser= subparsers.add_parser('list', help='Lists all current tasks')
+search_parser= subparsers.add_parser('search', help='Search whether a given task exists')
+delete_parser= subparsers.add_parser('delete', help='Delete specified task from the server')
+update_parser= subparsers.add_parser('update', help='Update specified task')
+
+#Deve ter um jeito melhor de fazer o que vou fazer evitando redundância, mas não consigo encontrar
+#Se tiver tempo depois procuro um pouco mais
+
+add_parser.add_argument('--json', type=open, required=True, help='A JSON file')
+#list não tem argumentos
+search_parser.add_argument('--id', type=int, required=True, help='An ID representing a given task')
+delete_parser.add_argument('--id', type=int, required=True, help='An ID representing a given task')
+update_parser.add_argument('--id', type=int, required=True, help='An ID representing a given task')
+update_parser.add_argument('--json', type=open, required=True, help='A JSON file')
+
+#Setar os callbacks
+argparser.set_defaults(func=call_help)
+help_parser.set_defaults(func=call_help)
+
+add_parser.set_defaults(func=task_add)
+list_parser.set_defaults(func=task_list)
+search_parser.set_defaults(func=task_search)
+delete_parser.set_defaults(func=task_delete)
+update_parser.set_defaults(func=task_update)
+
+
+
+
+#Vamos lá
+args = argparser.parse_args()
+args.func(args, url)
