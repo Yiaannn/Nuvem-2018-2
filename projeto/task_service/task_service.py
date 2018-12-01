@@ -2,6 +2,7 @@
 
 from flask import Flask, abort
 from flask_restful import Api, Resource, reqparse
+import boto3
 
 app = Flask(__name__)
 api = Api(app)
@@ -22,6 +23,13 @@ task_list = [
 ]
 
 task_keys=['id', 'description', 'priority', 'is_done']
+
+class DBManager():
+
+    s3= boto3.client('s3')
+
+    def get_task_list:
+        return
 
 class TaskGroup(Resource):
 

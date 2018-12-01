@@ -98,8 +98,14 @@ def main():
     ec2_client= boto3.client('ec2')
     ec2_resource= boto3.resource('ec2')
 
+    session = boto3.Session()
+    credentials = session.get_credentials()
+    aws_access_key_id= credentials.access_key
+    aws_secret_access_key= credentials.secret_key
+    aws_default_region= session.region_name
+
     with open('task_install.sh', 'r') as install_task:
-        init_script= install_task.read()
+        init_script= install_task.read().format(aws_access_key_id, aws_secret_access_key, aws_default_region)
 
     while(True):
         print("Rechecando...")
