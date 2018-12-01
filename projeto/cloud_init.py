@@ -237,7 +237,7 @@ def cloud_init(instance_amount):
 
     ec2_client= boto3.client('ec2')
     ec2_resource= boto3.resource('ec2')
-    with open('task_install.sh', 'r') as file_task, open('lb_install.sh', 'r') as file_lb:
+    with open('task_service/task_install.sh', 'r') as file_task, open('load_balancer/lb_install.sh', 'r') as file_lb:
 
         session = boto3.Session()
         credentials = session.get_credentials()
