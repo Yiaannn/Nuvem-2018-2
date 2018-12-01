@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 import time
 from pathlib import Path
 import argparse
+import os
 
 def jprint(json_dict):
     print(json.dumps(json_dict, sort_keys=True, indent=4))
@@ -263,7 +264,7 @@ def cloud_init(instance_amount):
     print("Esperando um IP ser provido para o load balancer...")
     wait_until_running(load_balancer)
 
-    print("Setando a variável de ambiente TASKSERVICE_URL para o IP do load balancer.")
+    print("Setando a variável de ambiente TASKSERVICE_URL para o IP do load balancer: "+str(load_balancer.public_ip_address))
     url='http://'+load_balancer.public_ip_address+':5000'
     os.environ["TASKSERVICE_URL"] = url
 
