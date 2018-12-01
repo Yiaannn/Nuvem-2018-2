@@ -15,7 +15,7 @@ sudo apt-get update
 sudo apt-get install -y python3-pip
 pip3 install flask flask_restful requests boto3
 #Load Balancer precisa do script de install do task service também, passar ele pro home
-cp ./Nuvem-2018-2/aps1/task_install.sh .
+cp ./Nuvem-2018-2/projeto/task_service/task_install.sh .
 echo > active_ips.txt
 python3 ./Nuvem-2018-2/projeto/load_balancer/lb_monitor.py &> lb_monitor.log &
 python3 ./Nuvem-2018-2/projeto/load_balancer/lb_service.py &> lb_service.log &

@@ -166,7 +166,7 @@ def terminate_load_balancer(ec2, wait):
         target_codes=[0, 16, 64, 80]
         if load_balancer.state['Code'] in target_codes:
             load_balancer.terminate()
-            print("Apagada a instância de IPv4 "+str(load_balancer.public_ip_address)+'.')
+            print("Apagado o Load Balancer de IPv4 "+str(load_balancer.public_ip_address)+'.')
 
     if not wait:
         return;
