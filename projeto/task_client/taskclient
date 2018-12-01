@@ -15,9 +15,11 @@ if url is None:
     print("Environment variable TASKSERVICE_URL not set, aborting.") #talvez o professor prefira um default se não tiver setado, não sei
     sys.exit(1)
 
-if not validators.url(url):
-    print("Environment variable TASKSERVICE_URL does not appear to be a valid URL, aborting.")
-    sys.exit(2)
+#if not validators.url(url):
+#    print("Environment variable TASKSERVICE_URL does not appear to be a valid URL, aborting.")
+#    sys.exit(2)
+
+#Estranhamente esse check falha com TASKSERVICE_URL='http://52.90.124.0:5000', vou ter que desabilitar por garantia
 
 def call_help(args, url):
     argparser.print_help()
