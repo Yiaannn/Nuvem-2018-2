@@ -73,12 +73,14 @@ class RerouteTaskID(Rerouter):
     def catch_all(self, id):
         print("Redirecionando chamada.")
         ips= self.get_ips()
-        ip= self.choose_ip_randomly(ips)
+        if ips:
+            ip= self.choose_ip_randomly(ips)
 
-        id_url= '/'+str(id)
-        url="http://"+ip+':5000'+'/Tarefa'+id_url
+            id_url= '/'+str(id)
+            url="http://"+ip+':5000'+'/Tarefa'+id_url
 
-        return self.reroute(url, request.get_json(), request.method)
+            return self.reroute(url, request.get_json(), request.method)
+        return '', 423
 
 
 class RerouteTask(Rerouter):
@@ -86,22 +88,26 @@ class RerouteTask(Rerouter):
     def catch_all(self):
         print("Redirecionando chamada.")
         ips= self.get_ips()
-        ip= self.choose_ip_randomly(ips)
+        if ips:
+            ip= self.choose_ip_randomly(ips)
 
-        url="http://"+ip+':5000'+'/Tarefa'
+            url="http://"+ip+':5000'+'/Tarefa'
 
-        return self.reroute(url, request.get_json(), request.method)
+            return self.reroute(url, request.get_json(), request.method)
+        return '', 423
 
 class RerouteHealthCheck (Rerouter):
 
     def catch_all(self):
         print("Redirecionando chamada.")
         ips= self.get_ips()
-        ip= self.choose_ip_randomly(ips)
+        if ips:
+            ip= self.choose_ip_randomly(ips)
 
-        url="http://"+ip+':5000'+'/healthcheck'
+            url="http://"+ip+':5000'+'/healthcheck'
 
-        return self.reroute(url, request.get_json(), request.method)
+            return self.reroute(url, request.get_json(), request.method)
+        return '', 423
 
 
 api.add_resource(RerouteTaskID, '/Tarefa/<int:id>')
