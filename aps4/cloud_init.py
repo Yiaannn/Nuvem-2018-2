@@ -101,7 +101,7 @@ def create_load_balancer(ec2, init_script):
     #botar minha keypair, security group e setar a mim mesmo como Owner
     #tipo t2.micro com ubuntu 18(.04? Imagino que sim por ser LTS)
 
-    instance= ec2.create_instances(
+    instances= ec2.create_instances(
         KeyName='alexandre_keypair',
         SecurityGroups=['alexandre_secgroup'],
         TagSpecifications=[
@@ -129,8 +129,8 @@ def create_load_balancer(ec2, init_script):
         MinCount=1
     )
 
-    print("Criada uma nova instância.")
-    return instance
+    print("Criado um novo Load Balancer.")
+    return instances[0]
 
 def get_my_instances(ec2):
     my_instances=[]
@@ -166,6 +166,9 @@ def terminate_load_balancer(ec2, wait):
     if load_balancer.state['Code'] in target_codes:
         load_balancer.terminate()
         print("Apagada a instância de IPv4 "+load_balancer.public_ip_address+'.')
+    else:
+        #load balancer já está terminado, acho
+        return
 
     if not wait:
         return;
@@ -173,14 +176,11 @@ def terminate_load_balancer(ec2, wait):
     need_to_check=True
     wait_time= 4
 
-    print("Esperando Load Balancer terminar...")
     while need_to_check:
-        need_to_check= False
-
-        if load_balancer.state['Code'] != 48: #48 marca termination
-            print("Esperando Load Balancer de IPv4 "+load_balancer.public_ip_address+' terminar.' )
-            need_to_check= True
+        print("Esperando Load Balancer de IPv4 "+load_balancer.public_ip_address+' terminar.' )
+        if load_balancer.state['Code'] == 48: #48 marca termination
             break
+
         time.sleep(wait_time)
         wait_time+= 4
 
@@ -241,13 +241,13 @@ def cloud_init(instance_amount):
     #for i in range(3):
     #    instance_init(ec2_resource, install_task)
     #Quem inicializa as instâncias agora é meu load balancer
-    lb_instance= create_load_balancer(ec2_resource, install_lb)
+    load_balancer= create_load_balancer(ec2_resource, install_lb)
     #Esperar que esteja estabilizado, pegar IP, setar na variavel de ambiente
     print("Esperando um IP ser provido para o load balancer...")
-    lb_instance.wait_until_running()
+    load_balancer.wait_until_running()
 
     print("Setando a variável de ambiente TASKSERVICE_URL para o IP do load balancer.")
-    url='http://'+lb_instance.public_ip_address+':5000'
+    url='http://'+load_balancer.public_ip_address+':5000'
     os.environ["TASKSERVICE_URL"] = url
 
     print("Terminado, é necessário esperar alguns minutos até a nuvem se estabilizar antes de utilizá-la.")
