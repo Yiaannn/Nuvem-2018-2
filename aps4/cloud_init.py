@@ -145,7 +145,7 @@ def get_my_instances(ec2):
 
     return my_instances
 
-def get_load_balancer(ec2):
+def get_load_balancers(ec2):
     load_balancers= []
 
     for instance in ec2.instances.all():
@@ -160,7 +160,7 @@ def get_load_balancer(ec2):
     return load_balancers
 
 def terminate_load_balancer(ec2, wait):
-    load_balancers= get_load_balancer(ec2)
+    load_balancers= get_load_balancers(ec2)
 
     for load_balancer in load_balancers:
         target_codes=[0, 16, 64, 80]
@@ -174,11 +174,16 @@ def terminate_load_balancer(ec2, wait):
     need_to_check=True
     wait_time= 4
 
+    print("Esperando Load Balancers terminarem...")
     while need_to_check:
-        print("Esperando Load Balancer de IPv4 "+load_balancer.public_ip_address+' terminar.' )
-        if load_balancer.state['Code'] == 48: #48 marca termination
-            break
+        load_balancers= get_load_balancers(ec2)
+        for load_balancer in load_balancers:
+            need_to_check= False
 
+            if load_balancer.state['Code'] != 48: #48 marca termination
+                print("Esperando instância de IPv4 "+load_balancer.public_ip_address+' terminar.' )
+                need_to_check= True
+                break
         time.sleep(wait_time)
         wait_time+= 4
 
@@ -201,8 +206,8 @@ def terminate_my_instances(ec2, wait):
     #esperar minhas instâncias teminarem
     print("Esperando instâncias terminarem...")
     while need_to_check:
+        my_instances= get_my_instances(ec2)
         for instance in my_instances:
-            my_instances= get_my_instances(ec2)
             need_to_check= False
 
             if instance.state['Code'] != 48: #48 marca termination
