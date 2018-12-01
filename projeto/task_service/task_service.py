@@ -3,24 +3,11 @@
 from flask import Flask, abort
 from flask_restful import Api, Resource, reqparse
 import boto3
+import json
+import time
 
 app = Flask(__name__)
 api = Api(app)
-
-task_list = [
-    {
-        'id': 0,
-        'description': u'Primeira tarefa de exemplo: duplicar Tribbles',
-        'priority': 0,
-        'is_done': False
-    },
-    {
-        'id': 1,
-        'description': u'Segunda tarefa de exemplo: Aprender a usar strings unicode em python',
-        'priority': 7,
-        'is_done': False
-    }
-]
 
 task_keys=['id', 'description', 'priority', 'is_done']
 
@@ -28,8 +15,36 @@ class DBManager():
 
     s3= boto3.client('s3')
 
-    def get_task_list:
-        return
+    def lock():
+        lock= '1'
+
+        while lock == '1':
+            sleep(1)
+
+            s3.Bucket('alexandre-bucket').download_file('dblock', 'dblock')
+            with open('dblock', 'r') as f:
+                lock= f.read(1)
+                #Esperar por lock == 0
+
+        lock='1'
+        with open('dblock', 'w') as f:
+            f.write(lock)
+
+    def unlock():
+        lock= '0'
+        with open('dblock', 'w') as f:
+            f.write(lock)
+
+    def get_tasks():
+
+        s3.Bucket('alexandre-bucket').download_file('tasksdb.json', 'tasksdb.json')
+        with open('tasksdb.json') as f:
+            body = json.load(f)
+        return body
+
+    def save_tasks(body):
+        with open('tasksdb') as f:
+            json.dump(body, f)
 
 class TaskGroup(Resource):
 
@@ -41,11 +56,16 @@ class TaskGroup(Resource):
         Resource.__init__(self)
 
     def get(self):
+        DBManager.lock()
         # lista todas as tarefas do dicionário
+        tasksdb= DBManager.get_tasks()
 
-        return { 'tasks': task_list}, 200
+        DBManager.unlock()
+        return body, 200
 
     def post(self):
+        DBManager.lock()
+
         param_dict = self.reqparse.parse_args()
 
         task = {
@@ -55,7 +75,11 @@ class TaskGroup(Resource):
             'is_done': False
         } #considerando que no meu init eu requesito esses parametros, o que acontece se eu omitir um?
 
-        task_list.append(task)
+        tasksdb= DBManager.get_tasks()
+        tasksdb['tasks'].append(task)
+        DBManager.save_tasks(tasksdb)
+
+        DBManager.unlock()
         return {'task': task}, 201
 
 class Task(Resource): #mudei o nome pra task só pelo bem de manter todo o código não-comentado em inglês
@@ -69,11 +93,19 @@ class Task(Resource): #mudei o nome pra task só pelo bem de manter todo o códi
         Resource.__init__(self)
 
     def get(self, id):
-        task= self.find(id)
+        DBManager.lock()
+
+        tasksdb= DBManager.get_tasks()
+        task= self.find(tasksdb, id)
+
+        DBManager.unlock()
         return { 'task': task }, 200
 
     def put(self, id):
-        task= self.find(id)
+        DBManager.lock()
+
+        tasksdb= DBManager.get_tasks()
+        task= self.find(tasksdb, id)
 
         param_dict= self.reqparse.parse_args()
 
@@ -84,19 +116,28 @@ class Task(Resource): #mudei o nome pra task só pelo bem de manter todo o códi
         for key, value in param_dict.items():
             if value is not None:
                 task[key]= value
+
+        DBManager.save_tasks(tasksdb)
+
+        DBManager.unlock()
         return { 'task': task }, 200
 
     def delete(self, id):
-        task= self.find(id)
-        task_list.remove(task)
+        DBManager.lock()
 
+        tasksdb= DBManager.get_tasks()
+        task= self.find(tasksdb, id)
+
+        tasksdb['tasks'].remove(task)
+
+        DBManager.unlock()
         return {'task': task}, 200
 
     #funções só pra reduzir redundância de código
 
-    def find(self, id):
+    def find(self, tasksdb, id):
         found= None
-        for task in task_list:
+        for task in tasksdb['tasks']:
             if id == task['id']:
                 found= task
                 break

@@ -234,7 +234,8 @@ def create_bucket(s3):
     name= 'alexandre-bucket'
 
     s3.create_bucket(Bucket=name)
-    s3.upload_file('bucket/initial_state.json', name, 'taskdb')
+    s3.upload_file('bucket/initial_state.json', name, 'tasksdb.json')
+    s3.upload_file('bucket/dblock', name, 'dblock')
 
     print("Carregado o estado inicial do serviço no Bucket")
 
