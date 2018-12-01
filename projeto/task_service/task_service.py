@@ -11,17 +11,20 @@ api = Api(app)
 
 task_keys=['id', 'description', 'priority', 'is_done']
 
+bucket_name= 'alexandre-bucket'
+
 class DBManager():
 
-    s3= boto3.client('s3')
+    s3_resource= boto3.resource('s3')
+    s3_client= boto3.client('s3')
 
     def lock():
         lock= '1'
 
         while lock == '1':
-            sleep(1)
+            time.sleep(1)
 
-            s3.Bucket('alexandre-bucket').download_file('dblock', 'dblock')
+            DBManager.s3_resource.Bucket(bucket_name).download_file('dblock', 'dblock')
             with open('dblock', 'r') as f:
                 lock= f.read(1)
                 #Esperar por lock == 0
@@ -29,22 +32,25 @@ class DBManager():
         lock='1'
         with open('dblock', 'w') as f:
             f.write(lock)
+        DBManager.s3_client.upload_file('dblock', bucket_name, 'dblock')
 
     def unlock():
         lock= '0'
         with open('dblock', 'w') as f:
             f.write(lock)
+        DBManager.s3_client.upload_file('dblock', bucket_name, 'dblock')
 
     def get_tasks():
 
-        s3.Bucket('alexandre-bucket').download_file('tasksdb.json', 'tasksdb.json')
-        with open('tasksdb.json') as f:
+        DBManager.s3_resource.Bucket(bucket_name).download_file('tasksdb.json', 'tasksdb.json')
+        with open('tasksdb.json', 'r') as f:
             body = json.load(f)
         return body
 
     def save_tasks(body):
-        with open('tasksdb') as f:
+        with open('tasksdb.json', 'w') as f:
             json.dump(body, f)
+        DBManager.s3_client.upload_file('tasksdb.json', bucket_name, 'tasksdb.json')
 
 class TaskGroup(Resource):
 
@@ -61,21 +67,22 @@ class TaskGroup(Resource):
         tasksdb= DBManager.get_tasks()
 
         DBManager.unlock()
-        return body, 200
+        return tasksdb, 200
 
     def post(self):
         DBManager.lock()
 
         param_dict = self.reqparse.parse_args()
+        tasksdb= DBManager.get_tasks()
 
         task = {
-            'id': task_list[-1]['id'] + 1,
+            'id': tasksdb['tasks'][-1]['id'] + 1,
             'description': param_dict['description'],
             'priority': param_dict['priority'],
             'is_done': False
         } #considerando que no meu init eu requesito esses parametros, o que acontece se eu omitir um?
 
-        tasksdb= DBManager.get_tasks()
+
         tasksdb['tasks'].append(task)
         DBManager.save_tasks(tasksdb)
 
@@ -129,6 +136,8 @@ class Task(Resource): #mudei o nome pra task só pelo bem de manter todo o códi
         task= self.find(tasksdb, id)
 
         tasksdb['tasks'].remove(task)
+
+        DBManager.save_tasks(tasksdb)
 
         DBManager.unlock()
         return {'task': task}, 200
