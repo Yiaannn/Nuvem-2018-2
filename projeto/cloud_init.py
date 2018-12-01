@@ -166,7 +166,7 @@ def terminate_load_balancer(ec2, wait):
         target_codes=[0, 16, 64, 80]
         if load_balancer.state['Code'] in target_codes:
             load_balancer.terminate()
-            print("Apagada a instância de IPv4 "+load_balancer.public_ip_address+'.')
+            print("Apagada a instância de IPv4 "+str(load_balancer.public_ip_address)+'.')
 
     if not wait:
         return;
@@ -196,7 +196,7 @@ def terminate_my_instances(ec2, wait):
         target_codes=[0, 16, 64, 80]
         if instance.state['Code'] in target_codes:
             instance.terminate()
-            print("Apagada a instância de IPv4 "+instance.public_ip_address+'.')
+            print("Apagada a instância de IPv4 "+str(instance.public_ip_address)+'.')
 
     if not wait:
         return;
@@ -211,7 +211,7 @@ def terminate_my_instances(ec2, wait):
         for instance in my_instances:
 
             if instance.state['Code'] != 48: #48 marca termination
-                print("Esperando instância de IPv4 "+instance.public_ip_address+' terminar...' )
+                print("Esperando instância de IPv4 "+str(instance.public_ip_address)+' terminar...' )
                 need_to_check= True
                 break
         time.sleep(wait_time)
