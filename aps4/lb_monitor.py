@@ -3,6 +3,7 @@ import requests
 import time
 from datetime import datetime as dt
 from datetime import timezone
+import os
 
 def get_my_instances(ec2):
     my_instances=[]
