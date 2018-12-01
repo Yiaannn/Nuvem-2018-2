@@ -263,7 +263,6 @@ def cloud_init(instance_amount):
     terminate_load_balancer(ec2_resource, True) #preciso matar o load balancer antes ou ele vai reinicializar instâncias
     terminate_my_instances(ec2_resource, True)
     create_bucket(s3)
-    return #deliberadamente crashar
     keypair_init(ec2_client)
     secgroup_init(ec2_client)
     #for i in range(3):
