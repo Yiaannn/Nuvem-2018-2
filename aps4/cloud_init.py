@@ -181,7 +181,7 @@ def terminate_load_balancer(ec2, wait):
             need_to_check= False
 
             if load_balancer.state['Code'] != 48: #48 marca termination
-                print("Esperando instância de IPv4 "+load_balancer.public_ip_address+' terminar.' )
+                print("Esperando Load Balancer de IPv4 "+load_balancer.public_ip_address+' terminar.' )
                 need_to_check= True
                 break
         time.sleep(wait_time)
@@ -222,7 +222,8 @@ def wait_until_running(load_balancer):
     wait_time= 4
 
     while need_to_check:
-        print("Esperando Load Balancer de IPv4 iniciar...")
+        load_balancer.reload()
+        print("Esperando Load Balancer iniciar...")
         if load_balancer.state['Code'] == 16: #48 marca running
             break
 
