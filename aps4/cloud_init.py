@@ -2,7 +2,6 @@ import boto3
 import json
 from botocore.exceptions import ClientError
 import time
-from pathlib import Path
 import argparse
 import os
 
@@ -239,17 +238,14 @@ def cloud_init(instance_amount):
     ec2_client= boto3.client('ec2')
     ec2_resource= boto3.resource('ec2')
     with open('task_install.sh', 'r') as file_task, open('lb_install.sh', 'r') as file_lb:
-        #Por enquanto assumo que minhas credenciais aws existem em um arquivo ~/.aws/credentials gerado pelo client aws
 
-        #formatar meu install_lb para incluir as credenciais
-        home = str(Path.home())
-        with open(home+'/.aws/credentials', 'r') as credentials:
-            content= credentials.readlines()
-            aws_access_key_id= content[1].split(' ')[-1].strip()
-            aws_secret_access_key= content[2].split(' ')[-1].strip()
+        session = boto3.Session()
+        credentials = session.get_credentials()
+        aws_access_key_id= credentials.access_key
+        aws_secret_access_key= credentials.secret_key
+        aws_default_region= session.region_name
 
-            install_lb= file_lb.read().format(aws_access_key_id, aws_secret_access_key, instance_amount)
-
+        install_lb= file_lb.read().format(aws_access_key_id, aws_secret_access_key, aws_default_region, instance_amount)
         install_task= file_task.read()
 
     terminate_load_balancer(ec2_resource, True) #preciso matar o load balancer antes ou ele vai reinicializar instâncias
