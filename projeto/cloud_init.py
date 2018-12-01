@@ -233,7 +233,7 @@ def wait_until_running(load_balancer):
 
 def cloud_init(instance_amount):
 
-    print('Reinicializando com '+str(instance_amount)+' instâncias a serem mantidas.')
+    print('Reinicializando com '+str(instance_amount)+' instância(s) a ser(em) mantida(s).')
 
     ec2_client= boto3.client('ec2')
     ec2_resource= boto3.resource('ec2')
