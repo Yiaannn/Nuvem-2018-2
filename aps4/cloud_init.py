@@ -146,6 +146,8 @@ def get_my_instances(ec2):
     return my_instances
 
 def get_load_balancer(ec2):
+    load_balancers= []
+
     for instance in ec2.instances.all():
 
         check= 0
@@ -153,22 +155,18 @@ def get_load_balancer(ec2):
             if (tag['Key'] == 'Owner' and tag['Value'] == 'alexandre') or (tag['Key']=='Service' and tag['Value'] == 'load_balancer'):
                 check+=1
         if check == 2:
-            return instance
+            load_balancers.append(instance)
+
+    return load_balancers
 
 def terminate_load_balancer(ec2, wait):
-    load_balancer= get_load_balancer(ec2)
+    load_balancers= get_load_balancer(ec2)
 
-    if not load_balancer:
-        print("Nenhum Load Balancer antigo encontrado")
-        return
-
-    target_codes=[0, 16, 64, 80]
-    if load_balancer.state['Code'] in target_codes:
-        load_balancer.terminate()
-        print("Apagada a instância de IPv4 "+load_balancer.public_ip_address+'.')
-    else:
-        #load balancer já está terminado, acho
-        return
+    for load_balancer in load_balancers:
+        target_codes=[0, 16, 64, 80]
+        if load_balancer.state['Code'] in target_codes:
+            load_balancer.terminate()
+            print("Apagada a instância de IPv4 "+load_balancer.public_ip_address+'.')
 
     if not wait:
         return;
@@ -214,6 +212,19 @@ def terminate_my_instances(ec2, wait):
         time.sleep(wait_time)
         wait_time+= 4
 
+def wait_until_running(load_balancer):
+    need_to_check=True
+    wait_time= 4
+
+    while need_to_check:
+        print("Esperando Load Balancer de IPv4 iniciar...")
+        if load_balancer.state['Code'] == 16: #48 marca running
+            break
+
+        time.sleep(wait_time)
+        wait_time+= 4
+
+
 def cloud_init(instance_amount):
 
     print('Reinicializando com '+str(instance_amount)+' instâncias a serem mantidas.')
@@ -244,7 +255,7 @@ def cloud_init(instance_amount):
     load_balancer= create_load_balancer(ec2_resource, install_lb)
     #Esperar que esteja estabilizado, pegar IP, setar na variavel de ambiente
     print("Esperando um IP ser provido para o load balancer...")
-    load_balancer.wait_until_running()
+    wait_until_running(load_balancer)
 
     print("Setando a variável de ambiente TASKSERVICE_URL para o IP do load balancer.")
     url='http://'+load_balancer.public_ip_address+':5000'
