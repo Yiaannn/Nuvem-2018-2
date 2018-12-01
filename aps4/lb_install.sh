@@ -12,7 +12,7 @@ export LOAD_BALANCER_INSTANCE_AMOUNT={}
 
 sudo apt-get update
 sudo apt-get install -y python3-pip
-pip3 install flask flask_restful requests
+pip3 install flask flask_restful requests boto3
 #Load Balancer precisa do script de install do task service também, passar ele pro home
 cp ./Nuvem-2018-2/aps1/task_install.sh ~
 echo > active_ips.txt
