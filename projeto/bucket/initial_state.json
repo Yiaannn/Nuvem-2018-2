@@ -1,0 +1,16 @@
+{
+  'tasks'= [
+    {
+        'id': 0,
+        'description': u'Primeira tarefa de exemplo: duplicar Tribbles',
+        'priority': 0,
+        'is_done': False
+    },
+    {
+        'id': 1,
+        'description': u'Segunda tarefa de exemplo: Aprender a usar strings unicode em python',
+        'priority': 7,
+        'is_done': False
+    }
+  ]
+}

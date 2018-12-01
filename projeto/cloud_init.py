@@ -230,6 +230,15 @@ def wait_until_running(load_balancer):
         time.sleep(wait_time)
         wait_time+= 4
 
+def create_bucket(s3):
+    name= 'alexandre-bucket'
+
+    s3.create_bucket(Bucket=name)
+    s3.upload_file('bucket/initial_state.json', name, 'taskdb')
+
+    print("Carregado o estado inicial do serviço no Bucket")
+
+
 
 def cloud_init(instance_amount):
 
@@ -237,6 +246,8 @@ def cloud_init(instance_amount):
 
     ec2_client= boto3.client('ec2')
     ec2_resource= boto3.resource('ec2')
+    s3= boto3.client('s3')
+
     with open('task_service/task_install.sh', 'r') as file_task, open('load_balancer/lb_install.sh', 'r') as file_lb:
 
         session = boto3.Session()
@@ -250,6 +261,8 @@ def cloud_init(instance_amount):
 
     terminate_load_balancer(ec2_resource, True) #preciso matar o load balancer antes ou ele vai reinicializar instâncias
     terminate_my_instances(ec2_resource, True)
+    create_bucket(s3)
+    return #deliberadamente crashar
     keypair_init(ec2_client)
     secgroup_init(ec2_client)
     #for i in range(3):
